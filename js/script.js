@@ -10,6 +10,12 @@ const repos = document.querySelector(".repos");
 // repo-data  Section where the individual repo data will appear
 const repoData = document.querySelector(".repo-data");
 
+// Back to Repo Gallery Button
+const backToRepoButton = document.querySelector(".view-repos");
+
+// filter input - selecting the input with the Search by name 
+const filterInput = document.querySelector(".filter-repos");
+
 const username = "Mr-Luka";
 
 const fetchGithHub = async function () {
@@ -21,7 +27,7 @@ const fetchGithHub = async function () {
 fetchGithHub();
 
 
-// Function that will display the fetched user information on the page
+                        // Function that will display the fetched user information on the page
 const displayUserInfo = function (data) {
     const newDiv = document.createElement("div");
     newDiv.classList.add("user-info");
@@ -39,7 +45,7 @@ const displayUserInfo = function (data) {
     getRepos();
 }
 
-// ASYNC function that will fetch all my repos
+                            // ASYNC function that will fetch all my repos
 const getRepos = async function () {
     const response = await fetch (`https://api.github.com/users/${username}/repos?sort=updated&per_page=100`);
     const repoData = await response.json();
@@ -47,8 +53,9 @@ const getRepos = async function () {
     showRepoInfo(repoData);
 }
 
-// Display Info about my Repos
+                            // Display Info about my Repos
 const showRepoInfo = function (repos) {
+    filterInput.classList.remove("hide");
     for (let repo of repos) {
         const li = document.createElement("li");
         li.classList.add("repo");
@@ -57,7 +64,7 @@ const showRepoInfo = function (repos) {
     }
 }
 
-// Click event for the repo list
+                            // Click event for the repo list
 repoList.addEventListener("click", function (e){
     if(e.target.matches("h3")) {
         const repoName = e.target.innerText;
@@ -66,13 +73,13 @@ repoList.addEventListener("click", function (e){
 });
 
 
-// Function to get Specific Repo Info
+                            // Function to get Specific Repo Info
 const specRepoInfo = async function (repoName) {
     const specRepository = await fetch (`https://api.github.com/repos/${username}/${repoName}`);
     const repoInfo = await specRepository.json();
     console.log(repoInfo);
 
-    // creating an array of Languages
+                            // creating an array of Languages
     const fetchLanguages = await fetch(repoInfo.languages_url);
     const languageData = await fetchLanguages.json();
     console.log(languageData);
@@ -85,7 +92,7 @@ const specRepoInfo = async function (repoName) {
     }
 }
 
-// Function to display Specific Repo Info
+                            // Function to display Specific Repo Info
 const displayRepoInfo = function (repoInfo, languages) {
     repoData.innerHTML = "";
     const newDiv = document.createElement("div");
@@ -95,6 +102,32 @@ const displayRepoInfo = function (repoInfo, languages) {
     <p>Languages: ${languages.join(", ")}</p>
     <a class="visit" href="${repoInfo.html_url}" target="_blank" rel="noreferrer noopener">View Repo on GitHub!</a>`;
     repoData.append(newDiv);
+
     repoData.classList.remove("hide");
     repos.classList.add("hide");
+    backToRepoButton.classList.remove("hide");
 }
+
+
+                            // Click event for the Back to Repo galery
+backToRepoButton.addEventListener("click", function (){
+    repos.classList.remove("hide");
+    repoData.classList.add("hide");
+    backToRepoButton.classList.add("hide");
+});
+
+// Adding Input event to the search box
+filterInput.addEventListener("input", function (e){
+    const searchValue = e.target.value;
+    const repos = document.querySelectorAll(".repo");
+    const searchLower = searchValue.toLowerCase();
+    console.log(searchLower);
+    for (let repo of repos) {
+        const lowercase = repo.innerText.toLowerCase();
+        if (lowercase.includes(searchLower)) {
+            repo.classList.remove("hide");
+        } else {
+            repo.classList.add("hide");
+        }
+    }
+});
